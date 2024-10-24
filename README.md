@@ -1,2 +1,6 @@
 # picturechan
-Program for auto-installing pictures from 4chan.org / 2chan.net / 2ch.hk threads
+PictureChan — this is program for autosave pictures from imageboards.
+Works with: 2chan.net, 4chan.org, 2ch.hk
+Programming language: Delphi
+
+Using: 
