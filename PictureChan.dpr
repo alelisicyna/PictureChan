@@ -2,7 +2,9 @@ program PictureChan;
 
 uses
   Vcl.Forms,
-  PictureChanMain in 'PictureChanMain.pas' {Window};
+  PictureChanMain in 'PictureChanMain.pas' {Window},
+  Vcl.Themes,
+  Vcl.Styles;
 
 {$R *.res}
 
