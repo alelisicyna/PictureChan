@@ -1,10 +1,10 @@
-unit PictureChanMain;
+﻿unit PictureChanMain;
 {$APPTYPE CONSOLE}
 
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.IOUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls,
   IdBaseComponent, IdComponent, IdTCPConnection, IdTCPClient,
   IdHTTP, IdSSLOpenSSL, System.Net.URLClient, System.Net.HttpClient,
@@ -51,21 +51,6 @@ implementation
 {$R *.dfm}
 
 
-function GetCurrentUserName: string;
-  const
-    cnMaxUserNameLen = 254;
-  var
-    sUserName: string;
-    dwUserNameLen: DWORD;
-  begin
-    dwUserNameLen := cnMaxUserNameLen - 1;
-    SetLength(sUserName, cnMaxUserNameLen);
-    GetUserName(PChar(sUserName), dwUserNameLen);
-    SetLength(sUserName, dwUserNameLen);
-    Result := sUserName;
-  end;
-
-
 function StreamToString(aStream: TStream): string;
 var
   SS: TStringStream;
@@ -93,8 +78,6 @@ var
   LList: IHtmlElementList;
   LStrStream: TStringStream;
   GetPicture: TPicture;
-  text: string;
-  count: integer;
 begin
   Save.Visible := False;
   TextError.Visible := False;
@@ -124,24 +107,24 @@ begin
                   // array
                 end;
 
-          // захаваць карцінкі ў ImageCollection
-          // ImageCollection.Add(LHtml.Attributes['href'], NetHTTPClient.Get(LHtml.Attributes['href']).ContentStream);
+          { захаваць карцінкі ў ImageCollection
+            ImageCollection.Add(LHtml.Attributes['href'], NetHTTPClient.Get(LHtml.Attributes['href']).ContentStream); }
 
-          // Стары код, частка зь яго потым спатрэбіцца
-          // PictureLink := 'https://www.2chan.net/b/src/' + LHtml.Find('a')[15].Text;
-          // GetPicture := TPicture.Create;
-          // try
-            // GetPicture.LoadFromStream(NetHTTPClient.Get(PictureLink).ContentStream);
-            // ImageCollection.Add('gg', GetPictrure);
-            // Image.Picture := GetPicture;
-            // Image.Hint := PictureLink;
-            // Save.Caption := 'Save 0/1';
-            // Save.Visible := True;
-          // except
-            // TextError.Visible := True;
-            // ColorError.Visible := True;
-            // GetPicture.Free;
-          // end;
+        { Стары код, частка зь яго потым спатрэбіцца
+          PictureLink := 'https://www.2chan.net/b/src/' + LHtml.Find('a')[15].Text;
+          GetPicture := TPicture.Create;
+          try
+            GetPicture.LoadFromStream(NetHTTPClient.Get(PictureLink).ContentStream);
+            ImageCollection.Add('gg', GetPictrure);
+            Image.Picture := GetPicture;
+            Image.Hint := PictureLink;
+            Save.Caption := 'Save 0/1';
+            Save.Visible := True;
+          except
+            TextError.Visible := True;
+            ColorError.Visible := True;
+            GetPicture.Free;
+          end; }
         end;
     except
       LStrStream.Free;
@@ -152,11 +135,10 @@ end;
 
 procedure TWindow.Saving(Sender: TObject);
 var
-  AdminName, LinkText, FolderDirectory: string;
+  LinkText, FolderDirectory: string;
 begin
   LinkText := Link.Text;
-  AdminName := GetCurrentUserName;
-  FolderDirectory := 'C:\Users\' + TrimRight(AdminName) + '\Desktop\Pictures';
+  FolderDirectory := TPath.Combine(TPath.GetDesktopPath(), 'Pictures', '');
   CreateDir(FolderDirectory);
   Link.Text := '';
   Save.Visible := False;
